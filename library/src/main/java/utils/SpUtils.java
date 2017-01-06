@@ -1,4 +1,4 @@
-package luo.baseandroid;
+package utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

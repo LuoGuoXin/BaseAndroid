@@ -1,4 +1,4 @@
-package luo.baseandroid;
+package luo.myapplication;
 
 import org.junit.Test;
 
