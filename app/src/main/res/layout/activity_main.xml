@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#FFFFFF"
     tools:context="luo.myapplication.MainActivity">
 
     <include layout="@layout/titleview_layout"/>
 
-    <TextView
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="哈哈哈"
-        android:textSize="@dimen/dimen_60_dip"/>
+        android:id="@+id/image"/>
 
 </LinearLayout>
