@@ -32,4 +32,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'org.xutils:xutils:3.3.40'
     compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.google.code.gson:gson:2.8.0'
 }

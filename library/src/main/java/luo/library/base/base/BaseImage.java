@@ -1,10 +1,12 @@
-package utils;
+package luo.library.base.base;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.widget.ImageView;
 
@@ -19,20 +21,20 @@ import luo.library.R;
 /**
  * 基本功能：图片加载工具
  */
-public class ImageLoader {
+public class BaseImage {
 
     public static final String ANDROID_RESOURCE = "android.resource://";
     public static final String FOREWARD_SLASH = "/";
 
     private static class ImageLoaderHolder {
-        private static final ImageLoader INSTANCE = new ImageLoader();
+        private static final BaseImage INSTANCE = new BaseImage();
 
     }
 
-    private ImageLoader() {
+    private BaseImage() {
     }
 
-    public static final ImageLoader getInstance() {
+    public static final BaseImage getInstance() {
         return ImageLoaderHolder.INSTANCE;
     }
 
@@ -115,6 +117,17 @@ public class ImageLoader {
                 .into(imageView);
     }
 
+    //加载网络图片显示为圆角图片
+    public void displayRoundImage(Context context, String url, ImageView imageView) {
+        Glide.with(context)
+                .load(url)
+                //.centerCrop()
+                .thumbnail(0.1f)
+                .transform(new GlideRoundTransform(context))
+                .crossFade()
+                .into(imageView);
+    }
+
     //将资源ID转为Uri
     public Uri resourceIdToUri(Context context, int resourceId) {
         return Uri.parse(ANDROID_RESOURCE + context.getPackageName() + FOREWARD_SLASH + resourceId);
@@ -158,6 +171,48 @@ public class ImageLoader {
         @Override
         public String getId() {
             return getClass().getName();
+        }
+    }
+
+    //基本功能：Glide显示为圆角图片
+    public class GlideRoundTransform extends BitmapTransformation {
+
+        private  float radius = 0f;
+
+        public GlideRoundTransform(Context context) {
+            this(context, 4);
+        }
+
+        public GlideRoundTransform(Context context, int dp) {
+            super(context);
+            this.radius = Resources.getSystem().getDisplayMetrics().density * dp;
+        }
+
+        @Override
+        protected Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
+            return roundCrop(pool, toTransform);
+        }
+
+        private  Bitmap roundCrop(BitmapPool pool, Bitmap source) {
+            if (source == null) return null;
+
+            Bitmap result = pool.get(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
+            if (result == null) {
+                result = Bitmap.createBitmap(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
+            }
+
+            Canvas canvas = new Canvas(result);
+            Paint paint = new Paint();
+            paint.setShader(new BitmapShader(source, BitmapShader.TileMode.CLAMP, BitmapShader.TileMode.CLAMP));
+            paint.setAntiAlias(true);
+            RectF rectF = new RectF(0f, 0f, source.getWidth(), source.getHeight());
+            canvas.drawRoundRect(rectF, radius, radius, paint);
+            return result;
+        }
+
+        @Override
+        public String getId() {
+            return getClass().getName() + Math.round(radius);
         }
     }
 

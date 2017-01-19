@@ -1,8 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/lay_bg"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/dimen_65_dip"
-    android:background="#3883D4">
+    android:layout_height="@dimen/dimen_65_dip">
 
 
     <LinearLayout

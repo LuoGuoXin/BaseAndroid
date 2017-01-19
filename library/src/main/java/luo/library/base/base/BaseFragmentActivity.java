@@ -1,15 +1,13 @@
-package luo.library.base;
+package luo.library.base.base;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,10 +18,10 @@ import android.widget.Toast;
 import org.xutils.x;
 
 import luo.library.R;
-import utils.SpUtils;
+import luo.library.base.utils.SpUtils;
 
 
-public class BaseActivity extends Activity {
+public class BaseFragmentActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +38,8 @@ public class BaseActivity extends Activity {
      * 设置标题栏信息
      */
     public void setTitleText(String string) {
+        RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.lay_bg);
+        relativeLayout.setBackgroundColor(Color.parseColor(BaseConstant.titleViewBackgroundColor));
         LinearLayout backTv = (LinearLayout) findViewById(R.id.ly_base_back);
         backTv.setOnClickListener(new View.OnClickListener() {
 
@@ -50,14 +50,6 @@ public class BaseActivity extends Activity {
         });
         TextView titleTv = (TextView) findViewById(R.id.tv_base_titleText);
         titleTv.setText(string);
-    }
-
-    /**
-     * 隐藏输入法
-     */
-    public void hideInput() {
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0); //隐藏
     }
 
     /**
@@ -107,7 +99,7 @@ public class BaseActivity extends Activity {
      * 弹出Toast
      */
     public void showToast(String string) {
-        Toast.makeText(BaseActivity.this, string, Toast.LENGTH_SHORT).show();
+        Toast.makeText(BaseFragmentActivity.this, string, Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -182,14 +174,14 @@ public class BaseActivity extends Activity {
      * @param object
      */
     public void putSp(String key, Object object) {
-        SpUtils.put(BaseActivity.this, key, object);
+        SpUtils.put(BaseFragmentActivity.this, key, object);
     }
 
     /**
      * 清除Sp数据
      */
     public void clearSp() {
-        SpUtils.clear(BaseActivity.this);
+        SpUtils.clear(BaseFragmentActivity.this);
     }
 
     /**
@@ -200,7 +192,7 @@ public class BaseActivity extends Activity {
      * @return
      */
     public Object getSp(String key, Object object) {
-        return SpUtils.get(BaseActivity.this, key, object);
+        return SpUtils.get(BaseFragmentActivity.this, key, object);
     }
 
 

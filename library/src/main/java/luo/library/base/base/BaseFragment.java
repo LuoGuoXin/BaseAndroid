@@ -1,4 +1,4 @@
-package luo.library.base;
+package luo.library.base.base;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import org.xutils.x;
 
-import utils.SpUtils;
+import luo.library.base.utils.SpUtils;
 
 
 public class BaseFragment extends Fragment {
