@@ -28,7 +28,6 @@ public class BaseImage {
 
     private static class ImageLoaderHolder {
         private static final BaseImage INSTANCE = new BaseImage();
-
     }
 
     private BaseImage() {
