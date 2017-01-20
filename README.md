@@ -30,7 +30,7 @@ Step 2. Add the dependency
 ```java
 dependencies {
     ...
-    compile 'com.github.LuoGuoXin:BaseAndroid:1.2.1'
+   compile 'com.github.LuoGuoXin:BaseAndroid:1.0.0'
 }
 ```
 
