@@ -35,6 +35,19 @@ dependencies {
 ```
 
 ## 使用示例
+在Application里面加上
+```java
+public class APP extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        x.Ext.init(this);
+        x.Ext.setDebug(true);
+        //设置标题栏背景颜色
+        BaseConstant.titleViewBackgroundColor = "#408F40";
+    }
+}
+```
 ```java
 //常用操作
     void init() {
