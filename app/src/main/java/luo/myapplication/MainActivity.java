@@ -27,7 +27,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setTitleText("标题");
+        http();
     }
 
     //常用操作
@@ -86,12 +87,13 @@ public class MainActivity extends BaseActivity {
     //网络请求操作
     //封装了下，onSuccess里面返回的result是请求成功（code=1）里面的内容，onError是code不等于1时的内容，网络错误时，code为-1
     void http() {
-        RequestParams params = new RequestParams("http://www.base");
+        RequestParams params = new RequestParams("http://115.28.13.1/lovect/bannerAction");
         BaseHttp.get(params, new BaseHttp.BaseHttpCallback() {
             @Override
             public void onSuccess(String result) {
-                PersonBean personBean = GsonUtil.GsonToBean(result, PersonBean.class);
-                List<PersonBean> list = GsonUtil.GsonToList(result, PersonBean.class);
+                LogUtil.i(result);
+              //  PersonBean personBean = GsonUtil.GsonToBean(result, PersonBean.class);
+              //  List<PersonBean> list = GsonUtil.GsonToList(result, PersonBean.class);
             }
 
             @Override

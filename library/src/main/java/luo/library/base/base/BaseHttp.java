@@ -67,15 +67,15 @@ public class BaseHttp {
                 Log.i(url[url.length - 1], result);
                 try {
                     JSONObject jsonObject = new JSONObject(result);
-                    int code = jsonObject.getInt("code");
-                    if (code == 1) {
-                        if (jsonObject.has("result")) {
-                            baseHttpCallback.onSuccess(jsonObject.getString("result"));
+                    int code = jsonObject.getInt(BaseAndroid.getBaseConfig().getHttpCode());
+                    if (code == BaseAndroid.getBaseConfig().getCode()) {
+                        if (jsonObject.has(BaseAndroid.getBaseConfig().getHttpResult())) {
+                            baseHttpCallback.onSuccess(jsonObject.getString(BaseAndroid.getBaseConfig().getHttpResult()));
                         } else {
                             baseHttpCallback.onSuccess("");
                         }
                     } else {
-                        baseHttpCallback.onError(code, jsonObject.getString("msg"));
+                        baseHttpCallback.onError(code, jsonObject.getString(BaseAndroid.getBaseConfig().getHttpMessage()));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
