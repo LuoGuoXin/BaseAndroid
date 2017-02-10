@@ -13,6 +13,7 @@ import org.xutils.view.annotation.ViewInject;
 import java.util.List;
 
 import luo.library.base.base.BaseActivity;
+import luo.library.base.base.BaseAndroid;
 import luo.library.base.base.BaseDb;
 import luo.library.base.base.BaseHttp;
 import luo.library.base.base.BaseImage;
@@ -28,7 +29,8 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitleText("标题");
-        http();
+
+        BaseAndroid.updateApk(MainActivity.this, "http://f5.market.mi-img.com/download/AppStore/0f4a347f5ce5a7e01315dda1ec35944fa56431d44/luo.footprint.apk");
     }
 
     //常用操作
@@ -61,27 +63,30 @@ public class MainActivity extends BaseActivity {
         //  openActivity(XX.class);
 
         //保存内容到 SharedPreferences，第一个参数为key，第二个参数为保存的内容
-        putSp("key","内容");
+        putSp("key", "内容");
 
         //从SharedPreferences上获取数据，第一个参数为key，第二个参数为默认内容
-        getSp("key","");
+        getSp("key", "");
 
         //清除SharedPreferences的数据
         clearSp();
 
+        //下载更新版本
+        BaseAndroid.updateApk(MainActivity.this, "http://f5.market.mi-img.com/download/AppStore/0f4a347f5ce5a7e01315dda1ec35944fa56431d44/luo.footprint.apk");
+
     }
 
     //图片显示操作
-    void image(){
+    void image() {
         //显示正常的图片，本地：new File("/ssd/base.jpg")；drawable：R.drawable.base
         //图片加载使用 Glide ，感觉还是挺流畅好用的
         BaseImage.getInstance().displayImage(MainActivity.this, "http://www.base.com/base.jpg", imageView);
 
         //显示圆角图片
-        BaseImage.getInstance().displayRoundImage(MainActivity.this,"http://www.base.com/base.jpg", imageView);
+        BaseImage.getInstance().displayRoundImage(MainActivity.this, "http://www.base.com/base.jpg", imageView);
 
         //显示圆形图片
-        BaseImage.getInstance().displayCricleImage(MainActivity.this,"http://www.base.com/base.jpg", imageView);
+        BaseImage.getInstance().displayCricleImage(MainActivity.this, "http://www.base.com/base.jpg", imageView);
     }
 
     //网络请求操作
@@ -92,8 +97,8 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onSuccess(String result) {
                 LogUtil.i(result);
-              //  PersonBean personBean = GsonUtil.GsonToBean(result, PersonBean.class);
-              //  List<PersonBean> list = GsonUtil.GsonToList(result, PersonBean.class);
+                //  PersonBean personBean = GsonUtil.GsonToBean(result, PersonBean.class);
+                //  List<PersonBean> list = GsonUtil.GsonToList(result, PersonBean.class);
             }
 
             @Override

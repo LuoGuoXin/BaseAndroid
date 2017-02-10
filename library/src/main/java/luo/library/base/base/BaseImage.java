@@ -16,8 +16,6 @@ import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 
 import java.io.File;
 
-import luo.library.R;
-
 /**
  * 基本功能：图片加载工具
  */
@@ -43,8 +41,8 @@ public class BaseImage {
         Glide.with(context)
                 .load(url)
                 .centerCrop()
-                .placeholder(R.drawable.ic_empty)
-                .error(R.drawable.ic_empty)
+                .placeholder(BaseAndroid.getBaseConfig().getFailPicture())
+                .error(BaseAndroid.getBaseConfig().getFailPicture())
                 .crossFade()
                 .thumbnail(0.1f)
                 .into(imageView);
@@ -92,6 +90,8 @@ public class BaseImage {
         Glide.with(context)
                 .load(resourceIdToUri(context, resId))
                 .crossFade()
+                .placeholder(BaseAndroid.getBaseConfig().getFailPicture())
+                .error(BaseAndroid.getBaseConfig().getFailPicture())
                 .transform(new GlideCircleTransform(context))
                 .into(imageView);
     }
@@ -102,6 +102,8 @@ public class BaseImage {
                 .load(url)
                 //.centerCrop()//网友反馈，设置此属性可能不起作用,在有些设备上可能会不能显示为圆形。
                 .thumbnail(0.1f)
+                .placeholder(BaseAndroid.getBaseConfig().getFailPicture())
+                .error(BaseAndroid.getBaseConfig().getFailPicture())
                 .transform(new GlideCircleTransform(context))
                 .crossFade()
                 .into(imageView);
@@ -122,6 +124,8 @@ public class BaseImage {
                 .load(url)
                 //.centerCrop()
                 .thumbnail(0.1f)
+                .placeholder(BaseAndroid.getBaseConfig().getFailPicture())
+                .error(BaseAndroid.getBaseConfig().getFailPicture())
                 .transform(new GlideRoundTransform(context))
                 .crossFade()
                 .into(imageView);
@@ -176,7 +180,7 @@ public class BaseImage {
     //基本功能：Glide显示为圆角图片
     public class GlideRoundTransform extends BitmapTransformation {
 
-        private  float radius = 0f;
+        private float radius = 0f;
 
         public GlideRoundTransform(Context context) {
             this(context, 4);
@@ -192,7 +196,7 @@ public class BaseImage {
             return roundCrop(pool, toTransform);
         }
 
-        private  Bitmap roundCrop(BitmapPool pool, Bitmap source) {
+        private Bitmap roundCrop(BitmapPool pool, Bitmap source) {
             if (source == null) return null;
 
             Bitmap result = pool.get(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);

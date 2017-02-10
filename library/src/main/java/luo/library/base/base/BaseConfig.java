@@ -1,5 +1,7 @@
 package luo.library.base.base;
 
+import luo.library.R;
+
 /**
  * 信息配置
  */
@@ -25,6 +27,14 @@ public class BaseConfig {
      * 网络请求返回的result
      */
     private String httpResult = "result";
+    /**
+     * APP图标
+     */
+    private int appLogo= R.drawable.ic_empty;
+    /**
+     * 图片加载中和加载失败显示的图
+     */
+    private int failPicture= R.drawable.ic_empty;
 
     public String getTitleViewBackgroundColor() {
         return titleViewBackgroundColor;
@@ -32,6 +42,24 @@ public class BaseConfig {
 
     public BaseConfig setTitleViewBackgroundColor(String titleViewBackgroundColor) {
         this.titleViewBackgroundColor = titleViewBackgroundColor;
+        return this;
+    }
+
+    public int getAppLogo() {
+        return appLogo;
+    }
+
+    public BaseConfig setAppLogo(int appLogo) {
+        this.appLogo = appLogo;
+        return  this;
+    }
+
+    public int getFailPicture() {
+        return failPicture;
+    }
+
+    public BaseConfig setFailPicture(int failPicture) {
+        this.failPicture = failPicture;
         return this;
     }
 
