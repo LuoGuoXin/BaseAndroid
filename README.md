@@ -30,9 +30,12 @@ Step 2. Add the dependency
 ```java
 dependencies {
     ...
-   compile 'com.github.LuoGuoXin:BaseAndroid:1.0.0'
+   compile 'com.github.LuoGuoXin:BaseAndroid:1.0.1'
 }
 ```
+
+## 更新说明
+2017/02/05 增加网络请求的设置参数、修改标题栏背景色的设置方式（看下面初始化示例）
 
 ## 使用示例
 在Application里面加上
@@ -43,8 +46,13 @@ public class APP extends Application {
         super.onCreate();
         x.Ext.init(this);
         x.Ext.setDebug(true);
-        //设置标题栏背景颜色
-        BaseConstant.titleViewBackgroundColor = "#408F40";
+	
+        BaseAndroid.init(new BaseConfig()
+               .setTitleViewBackgroundColor("#0AA770")//标题栏背景颜色，默认为#9EEA6A
+               .setCode(0)//网络请求成功返回的code数字，默认为1
+               .setHttpCode("code")//网络请求返回的code字段名称，默认为code
+               .setHttpMessage("msg")//网络请求返回的message字段名称，默认为message
+               .setHttpResult("resp"));//网络请求返回的result字段名称，默认为result
     }
 }
 ```
