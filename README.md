@@ -30,11 +30,12 @@ Step 2. Add the dependency
 ```java
 dependencies {
     ...
-   compile 'com.github.LuoGuoXin:BaseAndroid:1.0.1'
+   compile 'com.github.LuoGuoXin:BaseAndroid:1.0.2'
 }
 ```
 
 ## 更新说明
+2017/02/10 增加版本更新下载功能（通知栏显示进度条，下载完成提示安装）
 2017/02/05 增加网络请求的设置参数、修改标题栏背景色的设置方式（看下面初始化示例）
 
 ## 使用示例
@@ -48,11 +49,13 @@ public class APP extends Application {
         x.Ext.setDebug(true);
 	
         BaseAndroid.init(new BaseConfig()
-               .setTitleViewBackgroundColor("#0AA770")//标题栏背景颜色，默认为#9EEA6A
-               .setCode(0)//网络请求成功返回的code数字，默认为1
-               .setHttpCode("code")//网络请求返回的code字段名称，默认为code
-               .setHttpMessage("msg")//网络请求返回的message字段名称，默认为message
-               .setHttpResult("resp"));//网络请求返回的result字段名称，默认为result
+                .setTitleViewBackgroundColor("#0AA770")//标题栏背景颜色，默认为#9EEA6A
+                .setAppLogo(R.mipmap.ic_launcher)//app图标
+                .setFailPicture(R.mipmap.ic_launcher)//加载加载失败和加载中显示的图
+                .setCode(0)//网络请求成功返回的code数字，默认为1
+                .setHttpCode("code")//网络请求返回的code字段名称，默认为code
+                .setHttpMessage("msg")//网络请求返回的message字段名称，默认为message
+                .setHttpResult("resp"));//网络请求返回的result字段名称，默认为result
     }
 }
 ```
@@ -94,6 +97,9 @@ public class APP extends Application {
 
         //清除SharedPreferences的数据
         clearSp();
+	
+	 //下载更新版本
+        BaseAndroid.updateApk(MainActivity.this, "http://f5.market.mi-img.com/download/AppStore/0f4a347f5ce5a7e01315dda1ec35944fa56431d44/luo.footprint.apk");
 
     }
 
