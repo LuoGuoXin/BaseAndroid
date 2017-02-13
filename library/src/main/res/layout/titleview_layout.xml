@@ -1,12 +1,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/lay_bg"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/dimen_65_dip">
+    android:layout_height="50dp"
+    android:background="#000000">
 
 
     <LinearLayout
         android:id="@+id/ly_base_back"
-        android:layout_width="@dimen/dimen_60_dip"
+        android:layout_width="50dp"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
@@ -14,9 +15,9 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:layout_width="@dimen/dimen_42_dip"
-            android:layout_height="@dimen/dimen_42_dip"
-            android:padding="@dimen/dimen_8_dip"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
             android:src="@drawable/ic_back" />
 
     </LinearLayout>
@@ -24,35 +25,34 @@
     <TextView
         android:id="@+id/tv_base_titleText"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/dimen_45_dip"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:ellipsize="end"
         android:gravity="center"
         android:maxWidth="200dp"
-        android:singleLine="true"
         android:textColor="#FFFFFF"
-        android:textSize="@dimen/dimen_23_dip" />
+        android:textSize="18dp" />
 
     <TextView
         android:id="@+id/tv_base_edit"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/dimen_40_dip"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="@dimen/dimen_10_dip"
+        android:layout_marginRight="10dp"
         android:gravity="center|right"
-        android:paddingLeft="@dimen/dimen_10_dip"
-        android:paddingRight="@dimen/dimen_10_dip"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:textColor="#FFFFFF"
-        android:textSize="@dimen/dimen_20_dip"
-        android:visibility="gone" />
+        android:visibility="gone"
+        android:textSize="16dp" />
 
     <ImageView
         android:id="@+id/iv_right"
-        android:layout_width="@dimen/dimen_65_dip"
-        android:layout_height="@dimen/dimen_65_dip"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_alignParentRight="true"
-        android:padding="@dimen/dimen_15_dip" />
+        android:padding="8dp" />
 
 
 </RelativeLayout>

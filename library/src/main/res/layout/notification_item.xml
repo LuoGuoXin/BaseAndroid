@@ -24,7 +24,7 @@
                 android:layout_centerVertical="true"
                 android:padding="5dp"
                 android:text="安装包正在下载..."
-                android:textSize="@dimen/dimen_20_dip" />
+                android:textSize="15dp" />
 
             <TextView
                 android:id="@+id/tv_progress"
@@ -33,7 +33,7 @@
                 android:layout_alignParentRight="true"
                 android:padding="5dp"
                 android:text="0%"
-                android:textSize="@dimen/dimen_20_dip" />
+                android:textSize="15dp" />
         </RelativeLayout>
 
         <ProgressBar
