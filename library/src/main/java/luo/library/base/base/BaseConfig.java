@@ -8,9 +8,9 @@ import luo.library.R;
 
 public class BaseConfig {
     /**
-     * 标题栏背景颜色
+     * app主颜色
      */
-    private String titleViewBackgroundColor = "#9EEA6A";
+    private int appColor = R.color.base;
     /**
      * 网络请求成功返回的code码
      */
@@ -30,18 +30,19 @@ public class BaseConfig {
     /**
      * APP图标
      */
-    private int appLogo= R.drawable.ic_empty;
+    private int appLogo = R.drawable.ic_empty;
     /**
      * 图片加载中和加载失败显示的图
      */
-    private int failPicture= R.drawable.ic_empty;
+    private int failPicture = R.drawable.ic_empty;
 
-    public String getTitleViewBackgroundColor() {
-        return titleViewBackgroundColor;
+
+    public int getAppColor() {
+        return appColor;
     }
 
-    public BaseConfig setTitleViewBackgroundColor(String titleViewBackgroundColor) {
-        this.titleViewBackgroundColor = titleViewBackgroundColor;
+    public BaseConfig setAppColor(int appColor) {
+        this.appColor = appColor;
         return this;
     }
 
@@ -51,7 +52,7 @@ public class BaseConfig {
 
     public BaseConfig setAppLogo(int appLogo) {
         this.appLogo = appLogo;
-        return  this;
+        return this;
     }
 
     public int getFailPicture() {

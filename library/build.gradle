@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
-group='com.github.LuoGuoXin'
+group = 'com.github.LuoGuoXin'
 
 android {
     compileSdkVersion 24
@@ -28,4 +28,5 @@ dependencies {
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.android.support:support-fragment:24.2.1'
+    compile 'com.android.support:appcompat-v7:24.2.1'
 }

@@ -1,5 +1,7 @@
 package luo.myapplication;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -8,7 +10,7 @@ import android.widget.TextView;
 import org.xutils.common.util.LogUtil;
 import org.xutils.http.RequestParams;
 import org.xutils.view.annotation.ContentView;
-import org.xutils.view.annotation.ViewInject;
+import org.xutils.view.annotation.Event;
 
 import java.util.List;
 
@@ -17,19 +19,27 @@ import luo.library.base.base.BaseAndroid;
 import luo.library.base.base.BaseDb;
 import luo.library.base.base.BaseHttp;
 import luo.library.base.base.BaseImage;
+import luo.library.base.base.BaseWebViewActivity;
 import luo.library.base.utils.GsonUtil;
+import luo.library.base.widget.StatusBarCompat;
 
 @ContentView(R.layout.activity_main)
 public class MainActivity extends BaseActivity {
 
-    @ViewInject(R.id.image)
-    ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTitleText("标题");
+        setTitleText("BaseAndroid");
+        hideBack();
 
+    }
+
+    @Event(R.id.btn_webview)
+    private void webview(View view) {
+        Intent intent = new Intent(this, BaseWebViewActivity.class);
+        intent.putExtra(BaseWebViewActivity.URL, "http://www.baidu.com");
+        startActivity(intent);
     }
 
     //常用操作
@@ -50,6 +60,21 @@ public class MainActivity extends BaseActivity {
 
         //弹出Toast
         showToast("Toast");
+
+        //弹出加载窗口
+        startProgressDialog();
+
+        //弹出加载窗口，自定义提示
+        startProgressDialog("loading...");
+
+        //隐藏加载窗口
+        stopProgressDialog();
+
+        //设置透明状态栏
+        StatusBarCompat.translucentStatusBar(this);
+
+        //设置状态栏颜色
+        StatusBarCompat.setStatusBarColor(this, Color.BLUE);
 
         //获取 TextView 和 EditView 的内容
         TextView textView = new TextView(this);
@@ -79,6 +104,7 @@ public class MainActivity extends BaseActivity {
     void image() {
         //显示正常的图片，本地：new File("/ssd/base.jpg")；drawable：R.drawable.base
         //图片加载使用 Glide ，感觉还是挺流畅好用的
+        ImageView imageView = new ImageView(this);
         BaseImage.getInstance().displayImage(MainActivity.this, "http://www.base.com/base.jpg", imageView);
 
         //显示圆角图片

@@ -19,6 +19,7 @@ import org.xutils.x;
 
 import luo.library.R;
 import luo.library.base.utils.SpUtils;
+import luo.library.base.widget.LoadingDialog;
 
 
 public class BaseFragmentActivity extends FragmentActivity {
@@ -33,13 +34,35 @@ public class BaseFragmentActivity extends FragmentActivity {
         x.view().inject(this);
     }
 
+    /**
+     * 开启浮动加载进度条
+     */
+    public void startProgressDialog() {
+        LoadingDialog.showDialogForLoading(this);
+    }
+
+    /**
+     * 开启浮动加载进度条
+     *
+     * @param msg
+     */
+    public void startProgressDialog(String msg) {
+        LoadingDialog.showDialogForLoading(this, msg, true);
+    }
+
+    /**
+     * 停止浮动加载进度条
+     */
+    public void stopProgressDialog() {
+        LoadingDialog.cancelDialogForLoading();
+    }
 
     /**
      * 设置标题栏信息
      */
     public void setTitleText(String string) {
         RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.lay_bg);
-        relativeLayout.setBackgroundColor(Color.parseColor(BaseAndroid.getBaseConfig().getTitleViewBackgroundColor()));
+        relativeLayout.setBackgroundResource(BaseAndroid.getBaseConfig().getAppColor());
         LinearLayout backTv = (LinearLayout) findViewById(R.id.ly_base_back);
         backTv.setOnClickListener(new View.OnClickListener() {
 

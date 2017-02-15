@@ -2,23 +2,20 @@ package luo.library.base.base;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xutils.common.Callback;
-import org.xutils.common.util.LogUtil;
 import org.xutils.http.HttpMethod;
 import org.xutils.http.RequestParams;
 import org.xutils.x;
 
 import java.io.InputStream;
 import java.security.KeyStore;
-import java.security.SecureRandom;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
 
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 /**
@@ -48,13 +45,7 @@ public class BaseHttp {
     }
 
     public static void sendRequest(Context context, HttpMethod httpMethod, final RequestParams params, final BaseHttpCallback baseHttpCallback) {
-        /** 判断https证书是否成功验证 */
-        SSLContext sslContext = getSSLContext(context);
-        if (null == sslContext) {
-            Toast.makeText(context, "证书校验出错", Toast.LENGTH_LONG).show();
-            return;
-        }
-        params.setSslSocketFactory(sslContext.getSocketFactory());
+        params.setSslSocketFactory(getSSLCertifcation(context));
         sendRequest(httpMethod, params, baseHttpCallback);
     }
 
@@ -105,70 +96,38 @@ public class BaseHttp {
         void onError(int code, String message);
     }
 
-    /**
-     * Https 证书验证对象
-     */
-    private static SSLContext s_sSLContext = null;
 
-    /**
-     * 获取Https的证书
-     *
-     * @param context Activity（fragment）的上下文
-     * @return SSL的上下文对象
-     */
-    public static SSLContext getSSLContext(Context context) {
-        CertificateFactory certificateFactory = null;
-        InputStream inputStream = null;
-        Certificate cer = null;
-        KeyStore keystore = null;
-        TrustManagerFactory trustManagerFactory = null;
+    private final static String CLIENT_PRI_KEY = "client.bks";
+    private final static String TRUSTSTORE_PUB_KEY = "truststore.bks";
+    private final static String CLIENT_BKS_PASSWORD = "123456";
+    private final static String TRUSTSTORE_BKS_PASSWORD = "123456";
+    private final static String KEYSTORE_TYPE = "BKS";
+    private final static String PROTOCOL_TYPE = "TLS";
+    private final static String CERTIFICATE_FORMAT = "X509";
+
+    public static SSLSocketFactory getSSLCertifcation(Context context) {
+        SSLSocketFactory sslSocketFactory = null;
         try {
-            certificateFactory = CertificateFactory.getInstance("X.509");
-            inputStream = context.getAssets().open("ssl.crt");//这里导入SSL证书文件
-            try {
-                //读取证书
-                cer = certificateFactory.generateCertificate(inputStream);
-                LogUtil.i(cer.getPublicKey().toString());
-            } finally {
-                inputStream.close();
-            }
-            //创建一个证书库，并将证书导入证书库
-            keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keystore.load(null, null); //双向验证时使用
-            keystore.setCertificateEntry("trust", cer);
-
-            // 实例化信任库
-            trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            // 初始化信任库
-            trustManagerFactory.init(keystore);
-
-            s_sSLContext = SSLContext.getInstance("TLS");
-            s_sSLContext.init(null, trustManagerFactory.getTrustManagers(), new SecureRandom());
-
-            //信任所有证书 （官方不推荐使用）
-//         s_sSLContext.init(null, new TrustManager[]{new X509TrustManager() {
-//
-//              @Override
-//              public X509Certificate[] getAcceptedIssuers() {
-//                  return null;
-//              }
-//
-//              @Override
-//              public void checkServerTrusted(X509Certificate[] arg0, String arg1)
-//                      throws CertificateException {
-//
-//              }
-//
-//              @Override
-//              public void checkClientTrusted(X509Certificate[] arg0, String arg1)
-//                      throws CertificateException {
-//
-//              }
-//          }}, new SecureRandom());
-            return s_sSLContext;
-        } catch (Exception e) {
+            // 服务器端需要验证的客户端证书，其实就是客户端的keystore
+            KeyStore keyStore = KeyStore.getInstance(KEYSTORE_TYPE);// 客户端信任的服务器端证书
+            KeyStore trustStore = KeyStore.getInstance(KEYSTORE_TYPE);//读取证书
+            InputStream ksIn = context.getAssets().open(CLIENT_PRI_KEY);
+            InputStream tsIn = context.getAssets().open(TRUSTSTORE_PUB_KEY);//加载证书
+            keyStore.load(ksIn, CLIENT_BKS_PASSWORD.toCharArray());
+            trustStore.load(tsIn, TRUSTSTORE_BKS_PASSWORD.toCharArray());
+            ksIn.close();
+            tsIn.close();
+            //初始化SSLContext
+            SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TYPE);
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(CERTIFICATE_FORMAT);
+            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(CERTIFICATE_FORMAT);
+            trustManagerFactory.init(trustStore);
+            keyManagerFactory.init(keyStore, CLIENT_BKS_PASSWORD.toCharArray());
+            sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
+            sslSocketFactory = sslContext.getSocketFactory();
+        }  catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return sslSocketFactory;
     }
 }

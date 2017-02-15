@@ -13,6 +13,7 @@ import android.widget.Toast;
 import org.xutils.x;
 
 import luo.library.base.utils.SpUtils;
+import luo.library.base.widget.LoadingDialog;
 
 
 public class BaseFragment extends Fragment {
@@ -33,6 +34,28 @@ public class BaseFragment extends Fragment {
         }
     }
 
+    /**
+     * 开启浮动加载进度条
+     */
+    public void startProgressDialog() {
+        LoadingDialog.showDialogForLoading(getActivity());
+    }
+
+    /**
+     * 开启浮动加载进度条
+     *
+     * @param msg
+     */
+    public void startProgressDialog(String msg) {
+        LoadingDialog.showDialogForLoading(getActivity(), msg, true);
+    }
+
+    /**
+     * 停止浮动加载进度条
+     */
+    public void stopProgressDialog() {
+        LoadingDialog.cancelDialogForLoading();
+    }
 
     /**
      * 弹出Toast

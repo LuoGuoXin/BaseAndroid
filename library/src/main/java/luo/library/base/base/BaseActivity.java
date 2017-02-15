@@ -1,11 +1,11 @@
 package luo.library.base.base;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -21,9 +21,10 @@ import org.xutils.x;
 
 import luo.library.R;
 import luo.library.base.utils.SpUtils;
+import luo.library.base.widget.LoadingDialog;
 
 
-public class BaseActivity extends Activity {
+public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,17 +33,39 @@ public class BaseActivity extends Activity {
                 | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_UNSPECIFIED);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getSupportActionBar().hide();
         x.view().inject(this);
-
     }
 
+    /**
+     * 开启浮动加载进度条
+     */
+    public void startProgressDialog() {
+        LoadingDialog.showDialogForLoading(this);
+    }
+
+    /**
+     * 开启浮动加载进度条
+     *
+     * @param msg
+     */
+    public void startProgressDialog(String msg) {
+        LoadingDialog.showDialogForLoading(this, msg, true);
+    }
+
+    /**
+     * 停止浮动加载进度条
+     */
+    public void stopProgressDialog() {
+        LoadingDialog.cancelDialogForLoading();
+    }
 
     /**
      * 设置标题栏信息
      */
     public void setTitleText(String string) {
         RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.lay_bg);
-        relativeLayout.setBackgroundColor(Color.parseColor(BaseAndroid.getBaseConfig().getTitleViewBackgroundColor()));
+        relativeLayout.setBackgroundResource(BaseAndroid.getBaseConfig().getAppColor());
         LinearLayout backTv = (LinearLayout) findViewById(R.id.ly_base_back);
         backTv.setOnClickListener(new View.OnClickListener() {
 
