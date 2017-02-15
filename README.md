@@ -75,7 +75,7 @@ public class APP extends Application {
         });
 	
 	//打开网页，一个好用的webview
-	Intent intent = new Intent(this, BaseWebViewActivity.class);
+	  Intent intent = new Intent(this, BaseWebViewActivity.class);
         intent.putExtra(BaseWebViewActivity.URL, "http://www.baidu.com");
         startActivity(intent);
 	
