@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
+    android:id="@+id/activity_loading_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
     android:orientation="vertical"
-    tools:context="luo.myapplication.MainActivity">
+    android:background="#e9e9e9"
+    tools:context="luo.myapplication.LoadingViewActivity">
 
-    <include layout="@layout/titleview_layout" />
-
-
-    <Button
-        android:id="@+id/btn_webview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="webview使用" />
+    <include layout="@layout/titleview_layout"/>
 
     <Button
-        android:id="@+id/btn_loadingview"
+        android:id="@+id/btn_load"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="加载框的使用" />
+        android:text="打开默认加载框"/>
 
     <Button
-        android:id="@+id/btn_newsList"
+        android:id="@+id/btn_loadText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="网络请求的使用" />
+        android:text="打开自定义文字加载框"/>
+
+    <Button
+        android:id="@+id/btn_loadgif"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="打开gif加载框"/>
+
 
 </LinearLayout>

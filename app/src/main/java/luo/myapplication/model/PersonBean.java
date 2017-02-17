@@ -1,4 +1,4 @@
-package luo.myapplication;
+package luo.myapplication.model;
 
 import org.xutils.db.annotation.Column;
 import org.xutils.db.annotation.Table;

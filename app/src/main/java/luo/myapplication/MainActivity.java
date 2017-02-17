@@ -22,6 +22,7 @@ import luo.library.base.base.BaseImage;
 import luo.library.base.base.BaseWebViewActivity;
 import luo.library.base.utils.GsonUtil;
 import luo.library.base.widget.StatusBarCompat;
+import luo.myapplication.model.PersonBean;
 
 @ContentView(R.layout.activity_main)
 public class MainActivity extends BaseActivity {
@@ -32,7 +33,6 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setTitleText("BaseAndroid");
         hideBack();
-
     }
 
     @Event(R.id.btn_webview)
@@ -40,6 +40,16 @@ public class MainActivity extends BaseActivity {
         Intent intent = new Intent(this, BaseWebViewActivity.class);
         intent.putExtra(BaseWebViewActivity.URL, "http://www.baidu.com");
         startActivity(intent);
+    }
+
+    @Event(R.id.btn_loadingview)
+    private void loadingView(View view) {
+        openActivity(LoadingViewActivity.class);
+    }
+
+    @Event(R.id.btn_newsList)
+    private void newsList(View view) {
+        openActivity(NewsListActivity.class);
     }
 
     //常用操作

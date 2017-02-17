@@ -42,6 +42,13 @@ public class BaseFragment extends Fragment {
     }
 
     /**
+     * 开启浮动加载进度条Gif
+     */
+    public void startGifProgressDialog() {
+        LoadingDialog.showDialogForLoadingGif(getActivity());
+    }
+
+    /**
      * 开启浮动加载进度条
      *
      * @param msg

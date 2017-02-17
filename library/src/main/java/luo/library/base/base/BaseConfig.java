@@ -12,6 +12,10 @@ public class BaseConfig {
      */
     private int appColor = R.color.base;
     /**
+     * 加载框的gif图
+     */
+    private int loadingView = 0;
+    /**
      * 网络请求成功返回的code码
      */
     private int code = 1;
@@ -36,6 +40,14 @@ public class BaseConfig {
      */
     private int failPicture = R.drawable.ic_empty;
 
+    public int getLoadingView() {
+        return loadingView;
+    }
+
+    public BaseConfig setLoadingView(int loadingView) {
+        this.loadingView = loadingView;
+        return this;
+    }
 
     public int getAppColor() {
         return appColor;
