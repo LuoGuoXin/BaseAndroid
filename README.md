@@ -30,11 +30,12 @@ Step 2. Add the dependency
 ```java
 dependencies {
     ...
-   compile 'com.github.LuoGuoXin:BaseAndroid:1.0.2'
+   compile 'com.github.LuoGuoXin:BaseAndroid:1.0.3'
 }
 ```
 
 ## 更新说明
+<br>2017/02/15 增加加载框，增加BaseWebViewActivity
 <br>2017/02/10 增加版本更新下载功能（通知栏显示进度条，下载完成提示安装）
 <br>2017/02/05 增加网络请求的设置参数、修改标题栏背景色的设置方式（看下面初始化示例）
 
@@ -49,7 +50,7 @@ public class APP extends Application {
         x.Ext.setDebug(true);
 	
         BaseAndroid.init(new BaseConfig()
-                .setTitleViewBackgroundColor("#0AA770")//标题栏背景颜色，默认为#9EEA6A
+                .setAppColor(R.color.colorPrimary)//app主调颜色，用于标题栏等背景颜色
                 .setAppLogo(R.mipmap.ic_launcher)//app图标
                 .setFailPicture(R.mipmap.ic_launcher)//加载加载失败和加载中显示的图
                 .setCode(0)//网络请求成功返回的code数字，默认为1
@@ -62,7 +63,7 @@ public class APP extends Application {
 ```java
 //常用操作
     void init() {
-        //设置标题栏标题，记得先在布局上面添加标题栏布局： <include layout="@layout/titleview_layout"/>
+       //设置标题栏标题，记得先在布局上面添加标题栏布局： <include layout="@layout/titleview_layout"/>
         setTitleText("标题");
 
         //设置显示标题栏右边的按钮
@@ -72,12 +73,32 @@ public class APP extends Application {
                 //右边按钮点击事件
             }
         });
-
-        //隐藏返回箭头
+	
+	//打开网页，一个好用的webview
+	Intent intent = new Intent(this, BaseWebViewActivity.class);
+        intent.putExtra(BaseWebViewActivity.URL, "http://www.baidu.com");
+        startActivity(intent);
+	
+        //隐藏返回箭头
         hideBack();
 
         //弹出Toast
         showToast("Toast");
+
+        //弹出加载窗口
+        startProgressDialog();
+
+        //弹出加载窗口，自定义提示
+        startProgressDialog("loading...");
+
+        //隐藏加载窗口
+        stopProgressDialog();
+
+        //设置透明状态栏
+        StatusBarCompat.translucentStatusBar(this);
+
+        //设置状态栏颜色
+        StatusBarCompat.setStatusBarColor(this, Color.BLUE);
 
         //获取 TextView 和 EditView 的内容
         TextView textView = new TextView(this);
@@ -90,16 +111,16 @@ public class APP extends Application {
         //  openActivity(XX.class);
 
         //保存内容到 SharedPreferences，第一个参数为key，第二个参数为保存的内容
-        putSp("key","内容");
+        putSp("key", "内容");
 
         //从SharedPreferences上获取数据，第一个参数为key，第二个参数为默认内容
-        getSp("key","");
+        getSp("key", "");
 
         //清除SharedPreferences的数据
         clearSp();
-	
-	 //下载更新版本
-        BaseAndroid.updateApk(MainActivity.this, "http://f5.market.mi-img.com/download/AppStore/0f4a347f5ce5a7e01315dda1ec35944fa56431d44/luo.footprint.apk");
+
+        //下载更新版本
+        BaseAndroid.updateApk(MainActivity.this, "http://f5.market.mi-img.com/download/AppStore/0f4a347f5ce5a7e01315dda1ec35944fa56431d44/luo.footprint.apk");
 
     }
 
