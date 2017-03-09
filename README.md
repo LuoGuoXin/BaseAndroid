@@ -131,7 +131,9 @@ public class APP extends Application {
      * @param updateMessage 更新内容
      * @param isForced      是否强制更新
      */
-        BaseAndroid.checkUpdate(MainActivity.this,findViewById(R.id.activity_main), 2, "http://f5.market.mi-img.com/download/AppStore/0f4a347f5ce5a7e01315dda1ec35944fa56431d44/luo.footprint.apk", "更新了XXX\n修复OOO", false);
+        BaseAndroid.checkUpdate(MainActivity.this,findViewById(R.id.activity_main), 2, 
+	"http://f5.market.mi-img.com/download/AppStore/0f4a347f5ce5a7e01315dda1ec35944fa56431d44/luo.footprint.apk",
+	"更新了XXX\n修复OOO", false);
 
     }
 
