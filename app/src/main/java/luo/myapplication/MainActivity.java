@@ -33,6 +33,9 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setTitleText("BaseAndroid");
         hideBack();
+
+        //下载更新版本
+
     }
 
     @Event(R.id.btn_webview)
@@ -105,8 +108,8 @@ public class MainActivity extends BaseActivity {
         //清除SharedPreferences的数据
         clearSp();
 
-        //下载更新版本
-        BaseAndroid.updateApk(MainActivity.this, "http://f5.market.mi-img.com/download/AppStore/0f4a347f5ce5a7e01315dda1ec35944fa56431d44/luo.footprint.apk");
+        //版本更新
+        BaseAndroid.checkUpdate(MainActivity.this,findViewById(R.id.activity_main), 2, "http://f5.market.mi-img.com/download/AppStore/0f4a347f5ce5a7e01315dda1ec35944fa56431d44/luo.footprint.apk", "更新了XXX\n修复OOO", false);
 
     }
 

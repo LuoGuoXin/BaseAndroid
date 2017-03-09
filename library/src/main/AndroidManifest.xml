@@ -8,7 +8,6 @@
     <application
         android:allowBackup="true"
         android:supportsRtl="true">
-        <service android:name=".base.utils.UpdateService" />
 
         <activity android:name=".base.base.BaseWebViewActivity"></activity>
     </application>
