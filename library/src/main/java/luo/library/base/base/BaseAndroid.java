@@ -37,56 +37,33 @@ public class BaseAndroid {
      * @param isForced      是否强制更新
      */
     public static void checkUpdate(Context context, View view, int versionCode, String url, String updateMessage, boolean isForced) {
-        if (versionCode > getVersionCode(context)) {
+        if (versionCode > UpdateManager.getInstance().getVersionCode(context)) {
             int type = 0;//更新方式，0：引导更新，1：安装更新，2：强制更新
-            if (isWifi(context)) {
+            if (UpdateManager.getInstance().isWifi(context)) {
                 type = 1;
             }
             if (isForced) {
                 type = 2;
             }
-            UpdateManager.getInstance().setType(type).setUrl(url).setUpdateMessage(updateMessage);
+            //设置参数
+            UpdateManager.getInstance().setView(view).setType(type).setUrl(url).setUpdateMessage(updateMessage);
             switch (type) {
                 case 0:
-                    UpdateManager.getInstance().showPop(context, view);
+                    //非wifi情况下，先弹框后下载
+                    UpdateManager.getInstance().showPop(context);
                     break;
                 case 1:
-                    UpdateManager.getInstance().downloadFile(context, view, false);
+                    //wifi情况下，先下载后弹框
+                    UpdateManager.getInstance().downloadFile(context, false);
                     break;
                 case 2:
-                    UpdateManager.getInstance().showPop(context, view);
+                    //强制更新情况下，无论是否wifi都应该是先弹框
+                    UpdateManager.getInstance().showPop(context);
                     break;
             }
         }
 
     }
 
-    /**
-     * @return 当前应用的版本号
-     */
-    public static int getVersionCode(Context context) {
-        try {
-            PackageManager manager = context.getPackageManager();
-            PackageInfo info = manager.getPackageInfo(context.getPackageName(), 0);
-            int version = info.versionCode;
-            return version;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
 
-    /**
-     * 判断当前网络是否wifi
-     */
-    private static boolean isWifi(Context mContext) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) mContext
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
-        if (activeNetInfo != null
-                && activeNetInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-            return true;
-        }
-        return false;
-    }
 }

@@ -4,6 +4,10 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -28,7 +32,7 @@ import luo.library.R;
 import luo.library.base.base.BaseAndroid;
 
 /**
- * Created by WIN7 on 2017/3/9.
+ * 版本更新
  */
 
 public class UpdateManager {
@@ -36,6 +40,7 @@ public class UpdateManager {
     public int type = 0;//更新方式，0：引导更新，1：安装更新，2：强制更新
     public String url = "";//apk下载地址
     public String updateMessage = "";//更新内容
+    public View view;//activity根布局的view
     public String fileName = null;//文件名
     public Notification notification;
     public RemoteViews contentView;
@@ -50,6 +55,9 @@ public class UpdateManager {
         return updateManager;
     }
 
+    private UpdateManager() {
+
+    }
 
     public UpdateManager setUrl(String url) {
         this.url = url;
@@ -69,15 +77,24 @@ public class UpdateManager {
     }
 
 
-    public void showPop(final Context context, View view) {
+    public UpdateManager setView(View view) {
+        this.view = view;
+        return this;
+    }
+
+    /**
+     * 弹出版本更新提示框
+     */
+    public void showPop(final Context context) {
         View contentView = LayoutInflater.from(context).inflate(R.layout.base_dialog, null);
         final PopupWindow popupWindow = new PopupWindow(contentView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, true);
+        final TextView title = (TextView) contentView.findViewById(R.id.tv_title);
         TextView left = (TextView) contentView.findViewById(R.id.tv_left);
         TextView right = (TextView) contentView.findViewById(R.id.tv_right);
-        final TextView title = (TextView) contentView.findViewById(R.id.tv_title);
         TextView message = (TextView) contentView.findViewById(R.id.tv_message);
         RelativeLayout relativeLayout = (RelativeLayout) contentView.findViewById(R.id.rl);
 
+        //根据更新方式显示不同的文案
         if (type == 0) {
             title.setText("发现新版本");
             left.setText("立即更新");
@@ -87,6 +104,7 @@ public class UpdateManager {
         }
         right.setText("取消");
         message.setText(updateMessage);
+        //升级按钮，根据更新方式来做不同的操作，0和2是下载apk并显示通知栏，1是直接安装apk
         left.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -94,7 +112,7 @@ public class UpdateManager {
                 if (type == 0 | type == 2) {
                     if (url != null && !TextUtils.isEmpty(url)) {
                         createNotification(context);
-                        downloadFile(context, view, true);
+                        downloadFile(context, true);
                     } else {
                         Toast.makeText(context, "下载地址错误", Toast.LENGTH_SHORT).show();
                     }
@@ -104,6 +122,7 @@ public class UpdateManager {
 
             }
         });
+        //取消按钮，当更新方式为强制更新时，直接退出
         right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,6 +132,7 @@ public class UpdateManager {
                 }
             }
         });
+        //点击外边区域消失窗口
         if (type != 2) {
             relativeLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -125,21 +145,28 @@ public class UpdateManager {
     }
 
 
-    public void downloadFile(final Context context, final View view, final boolean installApk) {
+    /**
+     * 下载apk
+     * @param context
+     * @param installApk 下载完成后是否需要安装
+     */
+    public void downloadFile(final Context context, final boolean installApk) {
         File dir = new File(DOWNLOAD_PATH);
         if (!dir.exists()) {
             dir.mkdir();
         }
+        //截取apk的文件名
         fileName = url.substring(url.lastIndexOf("/") + 1, url.length());
         if (fileName == null && TextUtils.isEmpty(fileName) && !fileName.contains(".apk")) {
             fileName = context.getPackageName() + ".apk";
         }
-        File file=new File(DOWNLOAD_PATH + fileName);
-        if (file.exists()){
+        //判断是否存在了这个apk，存在了就不下载了，直接安装或者弹框提示
+        File file = new File(DOWNLOAD_PATH + fileName);
+        if (file.exists()) {
             if (installApk) {
                 installApk(context, new File(DOWNLOAD_PATH, fileName));
             } else {
-                showPop(context, view);
+                showPop(context);
             }
             return;
         }
@@ -179,6 +206,7 @@ public class UpdateManager {
 
             @Override
             public void onLoading(long total, long current, boolean isDownloading) {
+                //实时更新通知栏进度条
                 if (type != 1) {
                     notifyNotification(current, total);
                 }
@@ -186,7 +214,7 @@ public class UpdateManager {
                     if (installApk) {
                         installApk(context, new File(DOWNLOAD_PATH, fileName));
                     } else {
-                        showPop(context, view);
+                        showPop(context);
                     }
                 }
             }
@@ -200,29 +228,14 @@ public class UpdateManager {
                 BaseAndroid.getBaseConfig().getAppLogo(),//应用的图标
                 "安装包正在下载...",
                 System.currentTimeMillis());
-        notification.flags = Notification.FLAG_ONGOING_EVENT;
-        //notification.flags = Notification.FLAG_AUTO_CANCEL;
-
         /*** 自定义  Notification 的显示****/
         contentView = new RemoteViews(context.getPackageName(), R.layout.notification_item);
         contentView.setProgressBar(R.id.progress, 100, 0, false);
         contentView.setTextViewText(R.id.tv_progress, "0%");
         contentView.setImageViewResource(R.id.ic_logo, BaseAndroid.getBaseConfig().getAppLogo());
         notification.contentView = contentView;
-
-        /*updateIntent = new Intent(this, AboutActivity.class);
-          updateIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-     	updateIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-     	pendingIntent = PendingIntent.getActivity(this, 0, updateIntent, 0);
-      	notification.contentIntent = pendingIntent;*/
-        notification.flags = Notification.FLAG_AUTO_CANCEL;
+        notification.flags = Notification.DEFAULT_ALL;
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        //设置notification的PendingIntent
-        /*Intent intt = new Intent(this, MainActivity.class);
-        PendingIntent pi = PendingIntent.getActivity(this,100, intt,Intent.FLAG_ACTIVITY_NEW_TASK	| Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-		notification.contentIntent = pi;*/
-
         notificationManager.notify(R.layout.notification_item, notification);
     }
 
@@ -245,6 +258,35 @@ public class UpdateManager {
         intent.setAction(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
         context.startActivity(intent);
+    }
+
+    /**
+     * @return 当前应用的版本号
+     */
+    public int getVersionCode(Context context) {
+        try {
+            PackageManager manager = context.getPackageManager();
+            PackageInfo info = manager.getPackageInfo(context.getPackageName(), 0);
+            int version = info.versionCode;
+            return version;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * 判断当前网络是否wifi
+     */
+    public boolean isWifi(Context mContext) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) mContext
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeNetInfo != null
+                && activeNetInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+            return true;
+        }
+        return false;
     }
 
 }

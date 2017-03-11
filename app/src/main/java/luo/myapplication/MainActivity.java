@@ -34,8 +34,6 @@ public class MainActivity extends BaseActivity {
         setTitleText("BaseAndroid");
         hideBack();
 
-        //下载更新版本
-
     }
 
     @Event(R.id.btn_webview)
