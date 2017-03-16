@@ -11,14 +11,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.xutils.common.Callback;
@@ -30,21 +24,23 @@ import java.io.File;
 
 import luo.library.R;
 import luo.library.base.base.BaseAndroid;
+import luo.library.base.widget.BaseDialog;
 
 /**
  * 版本更新
  */
 
 public class UpdateManager {
-    public String DOWNLOAD_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/downloads/";
+    public String downLoadPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/downloads/";
     public int type = 0;//更新方式，0：引导更新，1：安装更新，2：强制更新
     public String url = "";//apk下载地址
     public String updateMessage = "";//更新内容
-    public View view;//activity根布局的view
     public String fileName = null;//文件名
+    public boolean isDownload = false;//是否下载
     public Notification notification;
     public RemoteViews contentView;
     public NotificationManager notificationManager;
+    public BaseDialog dialog;
 
     public static UpdateManager updateManager;
 
@@ -59,119 +55,63 @@ public class UpdateManager {
 
     }
 
-    public UpdateManager setUrl(String url) {
-        this.url = url;
-        return this;
-    }
-
-
-    public UpdateManager setType(int type) {
-        this.type = type;
-        return this;
-    }
-
-
-    public UpdateManager setUpdateMessage(String updateMessage) {
-        this.updateMessage = updateMessage;
-        return this;
-    }
-
-
-    public UpdateManager setView(View view) {
-        this.view = view;
-        return this;
-    }
-
     /**
      * 弹出版本更新提示框
      */
-    public void showPop(final Context context) {
-        View contentView = LayoutInflater.from(context).inflate(R.layout.base_dialog, null);
-        final PopupWindow popupWindow = new PopupWindow(contentView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, true);
-        final TextView title = (TextView) contentView.findViewById(R.id.tv_title);
-        TextView left = (TextView) contentView.findViewById(R.id.tv_left);
-        TextView right = (TextView) contentView.findViewById(R.id.tv_right);
-        TextView message = (TextView) contentView.findViewById(R.id.tv_message);
-        RelativeLayout relativeLayout = (RelativeLayout) contentView.findViewById(R.id.rl);
-
-        //根据更新方式显示不同的文案
-        if (type == 0) {
-            title.setText("发现新版本");
-            left.setText("立即更新");
+    public void showDialog(final Context context) {
+        String title = "";
+        String left = "";
+        boolean cancelable = true;
+        if (type == 1 | isDownload) {
+            title = "安装新版本";
+            left = "立即安装";
         } else {
-            title.setText("安装新版本");
-            left.setText("立即安装");
+            title = "发现新版本";
+            left = "立即更新";
         }
-        right.setText("取消");
-        message.setText(updateMessage);
-        //升级按钮，根据更新方式来做不同的操作，0和2是下载apk并显示通知栏，1是直接安装apk
-        left.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                popupWindow.dismiss();
-                if (type == 0 | type == 2) {
-                    if (url != null && !TextUtils.isEmpty(url)) {
-                        createNotification(context);
-                        downloadFile(context, true);
-                    } else {
-                        Toast.makeText(context, "下载地址错误", Toast.LENGTH_SHORT).show();
+        if (type == 2) {
+            cancelable = false;
+        }
+        dialog = new BaseDialog.Builder(context).setTitle(title).setMessage(updateMessage).setCancelable(cancelable)
+                .setLeftClick(left, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                        if (type == 1 | isDownload) {
+                            installApk(context, new File(downLoadPath, fileName));
+                        } else {
+                            if (url != null && !TextUtils.isEmpty(url)) {
+                                createNotification(context);
+                                downloadFile(context, true);
+                            } else {
+                                Toast.makeText(context, "下载地址错误", Toast.LENGTH_SHORT).show();
+                            }
+                        }
                     }
-                } else {
-                    installApk(context, new File(DOWNLOAD_PATH, fileName));
-                }
-
-            }
-        });
-        //取消按钮，当更新方式为强制更新时，直接退出
-        right.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                popupWindow.dismiss();
-                if (type == 2) {
-                    System.exit(0);
-                }
-            }
-        });
-        //点击外边区域消失窗口
-        if (type != 2) {
-            relativeLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    popupWindow.dismiss();
-                }
-            });
-        }
-        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+                })
+                .setRightClick("取消", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                        if (type == 2) {
+                            System.exit(0);
+                        }
+                    }
+                })
+                .create();
+        dialog.show();
     }
 
 
     /**
      * 下载apk
+     *
      * @param context
-     * @param installApk 下载完成后是否需要安装
+     * @param installApk 下载完成后是否立即安装
      */
     public void downloadFile(final Context context, final boolean installApk) {
-        File dir = new File(DOWNLOAD_PATH);
-        if (!dir.exists()) {
-            dir.mkdir();
-        }
-        //截取apk的文件名
-        fileName = url.substring(url.lastIndexOf("/") + 1, url.length());
-        if (fileName == null && TextUtils.isEmpty(fileName) && !fileName.contains(".apk")) {
-            fileName = context.getPackageName() + ".apk";
-        }
-        //判断是否存在了这个apk，存在了就不下载了，直接安装或者弹框提示
-        File file = new File(DOWNLOAD_PATH + fileName);
-        if (file.exists()) {
-            if (installApk) {
-                installApk(context, new File(DOWNLOAD_PATH, fileName));
-            } else {
-                showPop(context);
-            }
-            return;
-        }
         RequestParams params = new RequestParams(url);
-        params.setSaveFilePath(DOWNLOAD_PATH + fileName);
+        params.setSaveFilePath(downLoadPath + fileName);
         x.http().request(HttpMethod.GET, params, new Callback.ProgressCallback<File>() {
 
             @Override
@@ -181,7 +121,7 @@ public class UpdateManager {
 
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
-                Toast.makeText(context, "网络错误", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -211,10 +151,11 @@ public class UpdateManager {
                     notifyNotification(current, total);
                 }
                 if (total == current) {
+                    notificationManager.cancelAll();
                     if (installApk) {
-                        installApk(context, new File(DOWNLOAD_PATH, fileName));
+                        installApk(context, new File(downLoadPath, fileName));
                     } else {
-                        showPop(context);
+                        showDialog(context);
                     }
                 }
             }
@@ -236,14 +177,14 @@ public class UpdateManager {
         notification.contentView = contentView;
         notification.flags = Notification.DEFAULT_ALL;
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(R.layout.notification_item, notification);
+        notificationManager.notify(0, notification);
     }
 
     public void notifyNotification(long percent, long length) {
         contentView.setTextViewText(R.id.tv_progress, (percent * 100 / length) + "%");
         contentView.setProgressBar(R.id.progress, (int) length, (int) percent, false);
         notification.contentView = contentView;
-        notificationManager.notify(R.layout.notification_item, notification);
+        notificationManager.notify(0, notification);
     }
 
     /**
@@ -282,11 +223,35 @@ public class UpdateManager {
         ConnectivityManager connectivityManager = (ConnectivityManager) mContext
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
-        if (activeNetInfo != null
-                && activeNetInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+        if (activeNetInfo != null && activeNetInfo.getType() == ConnectivityManager.TYPE_WIFI) {
             return true;
         }
         return false;
+    }
+
+    public UpdateManager setUrl(String url) {
+        this.url = url;
+        return this;
+    }
+
+    public UpdateManager setType(int type) {
+        this.type = type;
+        return this;
+    }
+
+    public UpdateManager setUpdateMessage(String updateMessage) {
+        this.updateMessage = updateMessage;
+        return this;
+    }
+
+    public UpdateManager setFileName(String fileName) {
+        this.fileName = fileName;
+        return this;
+    }
+
+    public UpdateManager setIsDownload(boolean download) {
+        isDownload = download;
+        return this;
     }
 
 }

@@ -31,7 +31,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile project(':library')
     compile 'org.byteam.superadapter:superadapter:3.6.6'
-    //  compile 'com.github.LuoGuoXin:BaseAndroid:1.0.0'
+   //  compile 'com.github.LuoGuoXin:BaseAndroid:1.0.4'
     compile 'com.android.support:recyclerview-v7:24.2.1'
     compile 'com.malinskiy:superrecyclerview:1.1.4'
 

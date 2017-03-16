@@ -24,7 +24,7 @@ android {
 }
 
 dependencies {
-    compile 'org.xutils:xutils:3.3.40'
+    compile 'org.xutils:xutils:3.3.42'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.android.support:support-fragment:24.2.1'

@@ -53,6 +53,12 @@ public class MainActivity extends BaseActivity {
         openActivity(NewsListActivity.class);
     }
 
+    @Event(R.id.btn_update)
+    private void update(View view) {
+        BaseAndroid.checkUpdate(MainActivity.this,  2,
+                "http://f5.market.mi-img.com/download/AppStore/0f4a347f5ce5a7e01315dda1ec35944fa56431d44/luo.footprint.apk", "更新了XXX\n修复OOO", true);
+    }
+
     //常用操作
     void init() {
         //设置标题栏标题，记得先在布局上面添加标题栏布局： <include layout="@layout/titleview_layout"/>
@@ -107,7 +113,7 @@ public class MainActivity extends BaseActivity {
         clearSp();
 
         //版本更新
-        BaseAndroid.checkUpdate(MainActivity.this,findViewById(R.id.activity_main), 2, "http://f5.market.mi-img.com/download/AppStore/0f4a347f5ce5a7e01315dda1ec35944fa56431d44/luo.footprint.apk", "更新了XXX\n修复OOO", false);
+        BaseAndroid.checkUpdate(MainActivity.this, 2, "http://f5.market.mi-img.com/download/AppStore/0f4a347f5ce5a7e01315dda1ec35944fa56431d44/luo.footprint.apk", "更新了XXX\n修复OOO", false);
 
     }
 

@@ -1,114 +1,188 @@
 package luo.library.base.widget;
 
+import android.app.Dialog;
 import android.content.Context;
-import android.view.Display;
-import android.view.Gravity;
+import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.TextView;
 
 import luo.library.R;
 
 /**
- * Created by WIN7 on 2017/3/9.
+ * 全局样式对话框
  */
 
-public class BaseDialog {
-    Context context;
-    android.app.AlertDialog ad;
-    TextView titleView;
-    TextView messageView;
-    TextView leftView;
-    TextView rightView;
+public class BaseDialog extends Dialog {
+    private TextView tvTitle;
+    private TextView tvMsg;
+    private TextView tvLeft;
+    private TextView tvRight;
+    private View.OnClickListener onDefaultClickListener = new View.OnClickListener() {
 
-    public BaseDialog(Context context) {
-        this.context = context;
-        ad = new android.app.AlertDialog.Builder(context).create();
-       ad.show();
-        Window window = ad.getWindow();
-        window.setGravity(Gravity.CENTER);
-        window.setContentView(R.layout.base_dialog);
-        WindowManager m = window.getWindowManager();
-        Display d = m.getDefaultDisplay(); // 获取屏幕宽、高用
+        @Override
+        public void onClick(View view) {
+            cancel();
+        }
 
-        WindowManager.LayoutParams p = ad.getWindow().getAttributes(); // 获取对话框当前的参数值
-        // p.height = (int) (d.getHeight() * 0.6); // 高度设置为屏幕的0.6
-        p.width = (int) (d.getWidth() * 0.9); // 宽度设置为屏幕的0.95
-        window.setAttributes(p);
+    };
+    private View.OnClickListener onLeftListener = onDefaultClickListener;
+    private View.OnClickListener onRightListener = onDefaultClickListener;
+    private String mTitle;
+    private String mMessage;
+    private String leftText;
+    private String rightText;
 
-        titleView = (TextView) window.findViewById(R.id.tv_title);
-        messageView = (TextView) window.findViewById(R.id.tv_message);
-        leftView = (TextView) window.findViewById(R.id.tv_left);
-        rightView = (TextView) window.findViewById(R.id.tv_right);
+    private BaseDialog(Context context) {
+        super(context, R.style.BaseDialog);
     }
 
-    public void setTitle(int resId) {
-        titleView.setText(resId);
-    }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.base_dialog);
 
-    public void setTitle(String title) {
-        titleView.setText(title);
-    }
-
-    public void setMessage(int resId) {
-        messageView.setText(resId);
-    }
-
-    public void setMessage(String message) {
-        messageView.setText(message);
-    }
-
-    public void setLeftText(int resId) {
-        leftView.setText(resId);
-    }
-
-    public void setLeftText(String message) {
-        leftView.setText(message);
-    }
-
-    public void setRightText(int resId) {
-        rightView.setText(resId);
-    }
-
-    public void setRightText(String message) {
-        rightView.setText(message);
-    }
-
-
-    /**
-     * 设置左边按钮点击事件
-     */
-    public void setLeftClickListener(final View.OnClickListener listener) {
-        leftView.setOnClickListener(listener);
-    }
-
-
-    /**
-     * 设置右边按钮点击事件
-     */
-    public void setRightClickListener(final View.OnClickListener listener) {
-        rightView.setOnClickListener(listener);
+        tvTitle = (TextView) findViewById(R.id.tv_title);
+        tvMsg = (TextView) findViewById(R.id.tv_message);
+        tvLeft = (TextView) findViewById(R.id.tv_left);
+        tvRight = (TextView) findViewById(R.id.tv_right);
     }
 
     /**
-     * 设置点击外部是否可以关闭
+     * 调用完Builder类的create()方法后显示该对话框的方法
      */
-    public void setCancelable(boolean cancelable){
-        ad.setCancelable(cancelable);
-    }
-
-    /**
-     * 关闭对话框
-     */
-    public void dismiss() {
-        ad.dismiss();
-    }
-
-    /**
-     * 显示对话框
-     */
+    @Override
     public void show() {
-        ad.show();
+        super.show();
+        show(this);
+    }
+
+    private void show(BaseDialog mDialog) {
+        if (!TextUtils.isEmpty(mDialog.mTitle)) {
+            mDialog.tvTitle.setText(mDialog.mTitle);
+        }
+
+        if (!TextUtils.isEmpty(mDialog.mMessage)) {
+            mDialog.tvMsg.setText(mDialog.mMessage);
+        }
+
+        mDialog.tvRight.setOnClickListener(mDialog.onRightListener);
+        if (!TextUtils.isEmpty(mDialog.rightText)) {
+            mDialog.tvRight.setText(mDialog.rightText);
+        }
+
+        mDialog.tvLeft.setOnClickListener(mDialog.onLeftListener);
+        if (!TextUtils.isEmpty(mDialog.leftText)) {
+            mDialog.tvLeft.setText(mDialog.leftText);
+        }
+    }
+
+    public static class Builder {
+
+        private BaseDialog mDialog;
+
+        public Builder(Context context) {
+            mDialog = new BaseDialog(context);
+        }
+
+        /**
+         * 设置对话框标题
+         *
+         * @param title
+         */
+        public Builder setTitle(String title) {
+            mDialog.mTitle = title;
+            return this;
+        }
+
+        /**
+         * 设置对话框文本内容,如果调用了setView()方法，该项失效
+         *
+         * @param msg
+         */
+        public Builder setMessage(String msg) {
+            mDialog.mMessage = msg;
+            return this;
+        }
+
+        /**
+         * 设置确认按钮的回调
+         *
+         * @param onClickListener
+         */
+        public Builder setLeftClick(View.OnClickListener onClickListener) {
+            mDialog.onLeftListener = onClickListener;
+            return this;
+        }
+
+        /**
+         * 设置确认按钮的回调
+         *
+         * @param btnText,onClickListener
+         */
+        public Builder setLeftClick(String btnText, View.OnClickListener onClickListener) {
+            mDialog.leftText = btnText;
+            mDialog.onLeftListener = onClickListener;
+            return this;
+        }
+
+        /**
+         * 设置取消按钮的回掉
+         *
+         * @param onClickListener
+         */
+        public Builder setRightClick(View.OnClickListener onClickListener) {
+            mDialog.onRightListener = onClickListener;
+            return this;
+        }
+
+        /**
+         * 设置取消按钮的回调
+         *
+         * @param btnText,onClickListener
+         */
+        public Builder setRightClick(String btnText, View.OnClickListener onClickListener) {
+            mDialog.rightText = btnText;
+            mDialog.onRightListener = onClickListener;
+            return this;
+        }
+
+
+        /**
+         * 设置该对话框能否被Cancel掉，默认可以
+         *
+         * @param cancelable
+         */
+        public Builder setCancelable(boolean cancelable) {
+            mDialog.setCancelable(cancelable);
+            return this;
+        }
+
+        /**
+         * 设置对话框被cancel对应的回调接口，cancel()方法被调用时才会回调该接口
+         *
+         * @param onCancelListener
+         */
+        public Builder setOnCancelListener(OnCancelListener onCancelListener) {
+            mDialog.setOnCancelListener(onCancelListener);
+            return this;
+        }
+
+        /**
+         * 设置对话框消失对应的回调接口，一切对话框消失都会回调该接口
+         *
+         * @param onDismissListener
+         */
+        public Builder setOnDismissListener(OnDismissListener onDismissListener) {
+            mDialog.setOnDismissListener(onDismissListener);
+            return this;
+        }
+
+        /**
+         * 通过Builder类设置完属性后构造对话框的方法
+         */
+        public BaseDialog create() {
+            return mDialog;
+        }
     }
 }

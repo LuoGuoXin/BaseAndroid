@@ -1,11 +1,10 @@
 package luo.library.base.base;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.view.View;
+import android.os.Environment;
+import android.text.TextUtils;
+
+import java.io.File;
 
 import luo.library.base.utils.UpdateManager;
 
@@ -36,7 +35,7 @@ public class BaseAndroid {
      * @param updateMessage 更新内容
      * @param isForced      是否强制更新
      */
-    public static void checkUpdate(Context context, View view, int versionCode, String url, String updateMessage, boolean isForced) {
+    public static void checkUpdate(Context context, int versionCode, String url, String updateMessage, boolean isForced) {
         if (versionCode > UpdateManager.getInstance().getVersionCode(context)) {
             int type = 0;//更新方式，0：引导更新，1：安装更新，2：强制更新
             if (UpdateManager.getInstance().isWifi(context)) {
@@ -45,21 +44,25 @@ public class BaseAndroid {
             if (isForced) {
                 type = 2;
             }
+
+            //检测是否已下载
+            String downLoadPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/downloads/";
+            File dir = new File(downLoadPath);
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+            String fileName = url.substring(url.lastIndexOf("/") + 1, url.length());
+            if (fileName == null && TextUtils.isEmpty(fileName) && !fileName.contains(".apk")) {
+                fileName = context.getPackageName() + ".apk";
+            }
+            File file = new File(downLoadPath + fileName);
+
             //设置参数
-            UpdateManager.getInstance().setView(view).setType(type).setUrl(url).setUpdateMessage(updateMessage);
-            switch (type) {
-                case 0:
-                    //非wifi情况下，先弹框后下载
-                    UpdateManager.getInstance().showPop(context);
-                    break;
-                case 1:
-                    //wifi情况下，先下载后弹框
-                    UpdateManager.getInstance().downloadFile(context, false);
-                    break;
-                case 2:
-                    //强制更新情况下，无论是否wifi都应该是先弹框
-                    UpdateManager.getInstance().showPop(context);
-                    break;
+            UpdateManager.getInstance().setType(type).setUrl(url).setUpdateMessage(updateMessage).setFileName(fileName).setIsDownload(file.exists());
+            if (type == 1 && !file.exists()) {
+                UpdateManager.getInstance().downloadFile(context, false);
+            } else {
+                UpdateManager.getInstance().showDialog(context);
             }
         }
 
