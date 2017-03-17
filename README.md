@@ -30,12 +30,12 @@ Step 2. Add the dependency
 ```java
 dependencies {
     ...
-   compile 'com.github.LuoGuoXin:BaseAndroid:1.0.4'
+   compile 'com.github.LuoGuoXin:BaseAndroid:1.0.5'
 }
 ```
 
 ## 更新说明
-<br>2017/03/09 修改版本更新功能
+<br>2017/03/15 修改版本更新功能，一行代码实现
 <br>2017/02/15 增加加载框，增加BaseWebViewActivity
 <br>2017/02/10 增加版本更新下载功能（通知栏显示进度条，下载完成提示安装）
 <br>2017/02/05 增加网络请求的设置参数、修改标题栏背景色的设置方式（看下面初始化示例）
@@ -122,16 +122,15 @@ public class APP extends Application {
 
       
        /**
-     * 版本更新  （记得要在加载完布局后才调用）
+     * 版本更新  
      *
      * @param context
-     *  @param view         activity主布局
      * @param versionCode   版本号
      * @param url           apk下载地址
      * @param updateMessage 更新内容
      * @param isForced      是否强制更新
      */
-        BaseAndroid.checkUpdate(MainActivity.this,findViewById(R.id.activity_main), 2, 
+        BaseAndroid.checkUpdate(MainActivity.this,2, 
 	"http://f5.market.mi-img.com/download/AppStore/0f4a347f5ce5a7e01315dda1ec35944fa56431d44/luo.footprint.apk",
 	"更新了XXX\n修复OOO", false);
 
