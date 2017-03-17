@@ -2,6 +2,7 @@ package luo.library.base.utils;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -10,9 +11,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import org.xutils.common.Callback;
@@ -22,25 +23,26 @@ import org.xutils.x;
 
 import java.io.File;
 
-import luo.library.R;
 import luo.library.base.base.BaseAndroid;
 import luo.library.base.widget.BaseDialog;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * 版本更新
  */
 
 public class UpdateManager {
-    public String downLoadPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/downloads/";
-    public int type = 0;//更新方式，0：引导更新，1：安装更新，2：强制更新
-    public String url = "";//apk下载地址
-    public String updateMessage = "";//更新内容
-    public String fileName = null;//文件名
-    public boolean isDownload = false;//是否下载
-    public Notification notification;
-    public RemoteViews contentView;
-    public NotificationManager notificationManager;
-    public BaseDialog dialog;
+    private String downLoadPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/downloads/";
+    private int type = 0;//更新方式，0：引导更新，1：安装更新，2：强制更新
+    private String url = "";//apk下载地址
+    private String updateMessage = "";//更新内容
+    private String fileName = null;//文件名
+    private boolean isDownload = false;//是否下载
+    private NotificationManager mNotifyManager;
+    private NotificationCompat.Builder mBuilder;
+    private BaseDialog dialog;
+    private ProgressDialog progressDialog;
 
     public static UpdateManager updateManager;
 
@@ -81,8 +83,12 @@ public class UpdateManager {
                             installApk(context, new File(downLoadPath, fileName));
                         } else {
                             if (url != null && !TextUtils.isEmpty(url)) {
-                                createNotification(context);
-                                downloadFile(context, true);
+                                if (type == 2) {
+                                    createProgress(context);
+                                } else {
+                                    createNotification(context);
+                                }
+                                downloadFile(context);
                             } else {
                                 Toast.makeText(context, "下载地址错误", Toast.LENGTH_SHORT).show();
                             }
@@ -106,10 +112,8 @@ public class UpdateManager {
     /**
      * 下载apk
      *
-     * @param context
-     * @param installApk 下载完成后是否立即安装
      */
-    public void downloadFile(final Context context, final boolean installApk) {
+    public void downloadFile(final Context context) {
         RequestParams params = new RequestParams(url);
         params.setSaveFilePath(downLoadPath + fileName);
         x.http().request(HttpMethod.GET, params, new Callback.ProgressCallback<File>() {
@@ -147,44 +151,64 @@ public class UpdateManager {
             @Override
             public void onLoading(long total, long current, boolean isDownloading) {
                 //实时更新通知栏进度条
-                if (type != 1) {
+                if (type == 0) {
                     notifyNotification(current, total);
+                } else if (type == 2) {
+                    progressDialog.setProgress((int) (current * 100 / total));
                 }
                 if (total == current) {
-                    notificationManager.cancelAll();
-                    if (installApk) {
-                        installApk(context, new File(downLoadPath, fileName));
-                    } else {
+                    if (type == 0) {
+                        mBuilder.setContentText("下载完成");
+                        mNotifyManager.notify(10086, mBuilder.build());
+                    } else if (type == 2) {
+                        progressDialog.setMessage("下载完成");
+                    }
+                    if (type == 1) {
                         showDialog(context);
+                    } else {
+                        installApk(context, new File(downLoadPath, fileName));
                     }
                 }
             }
         });
     }
 
-
-    @SuppressWarnings("deprecation")
-    public void createNotification(Context context) {
-        notification = new Notification(
-                BaseAndroid.getBaseConfig().getAppLogo(),//应用的图标
-                "安装包正在下载...",
-                System.currentTimeMillis());
-        /*** 自定义  Notification 的显示****/
-        contentView = new RemoteViews(context.getPackageName(), R.layout.notification_item);
-        contentView.setProgressBar(R.id.progress, 100, 0, false);
-        contentView.setTextViewText(R.id.tv_progress, "0%");
-        contentView.setImageViewResource(R.id.ic_logo, BaseAndroid.getBaseConfig().getAppLogo());
-        notification.contentView = contentView;
-        notification.flags = Notification.DEFAULT_ALL;
-        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(0, notification);
+    /**
+     * 强制更新时显示在屏幕的进度条
+     *
+     */
+    private void createProgress(Context context) {
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setMax(100);
+        progressDialog.setCancelable(false);
+        progressDialog.setMessage("正在下载...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.show();
     }
 
-    public void notifyNotification(long percent, long length) {
-        contentView.setTextViewText(R.id.tv_progress, (percent * 100 / length) + "%");
-        contentView.setProgressBar(R.id.progress, (int) length, (int) percent, false);
-        notification.contentView = contentView;
-        notificationManager.notify(0, notification);
+    /**
+     * 创建通知栏进度条
+     *
+     */
+    private void createNotification(Context context) {
+        mNotifyManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        mBuilder = new NotificationCompat.Builder(context);
+        mBuilder.setSmallIcon(BaseAndroid.getBaseConfig().getAppLogo());
+        mBuilder.setContentTitle("版本更新");
+        mBuilder.setContentText("正在下载...");
+        mBuilder.setProgress(0, 0, false);
+        Notification notification = mBuilder.build();
+        notification.flags = Notification.FLAG_AUTO_CANCEL;
+        mNotifyManager.notify(10086, notification);
+    }
+
+    /**
+     * 更新通知栏进度条
+     *
+     */
+    private void notifyNotification(long percent, long length) {
+        mBuilder.setProgress((int) length, (int) percent, false);
+        mNotifyManager.notify(10086, mBuilder.build());
     }
 
     /**
@@ -193,7 +217,7 @@ public class UpdateManager {
      * @param context 上下文
      * @param file    APK文件
      */
-    public void installApk(Context context, File file) {
+    private void installApk(Context context, File file) {
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setAction(Intent.ACTION_VIEW);

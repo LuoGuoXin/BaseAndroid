@@ -60,7 +60,7 @@ public class BaseAndroid {
             //设置参数
             UpdateManager.getInstance().setType(type).setUrl(url).setUpdateMessage(updateMessage).setFileName(fileName).setIsDownload(file.exists());
             if (type == 1 && !file.exists()) {
-                UpdateManager.getInstance().downloadFile(context, false);
+                UpdateManager.getInstance().downloadFile(context);
             } else {
                 UpdateManager.getInstance().showDialog(context);
             }
