@@ -46,7 +46,7 @@ public class BaseAndroid {
             }
 
             //检测是否已下载
-            String downLoadPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/downloads/";
+            String downLoadPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/";
             File dir = new File(downLoadPath);
             if (!dir.exists()) {
                 dir.mkdir();
